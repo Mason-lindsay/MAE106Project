@@ -1,12 +1,12 @@
-#include "Servo.h"
+#include "Servos.h"
 #include <Arduino.h>
 
 Servo servo;
 int midpoint = 90; // Define midpoint angle
 
 void ServoSetup() {
-    servo.attach(ServIn); // Attach the servo to the defined pin
-    servo.write(midpoint);      // Set initial position to 90 degrees
+    servo.attach(SERV_IN); // Attach the servo to the defined pin
+    servo.write(midpoint); // Set initial position to 90 degrees
 }
 
 void ServoLoop() {

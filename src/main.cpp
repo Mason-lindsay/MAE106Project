@@ -1,5 +1,6 @@
 #include <Arduino.h>
-#include "Servo1.h"
+#include "Servos.h"
+
 
 
 // put function declarations here:
