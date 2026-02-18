@@ -2,11 +2,7 @@
 #include "Servos.h"
 #include "Switch.h"
 #include "Compass.h"
-#include "Solonoid.h"
-
-
-// put function declarations here:
-
+#include "Solenoid.h"
 
 void setup() {
   // put your setup code here, to run once:
@@ -18,16 +14,20 @@ void setup() {
   Serial.println("Switch Setup Complete");
   CompassSetup();
   Serial.println("Compass Setup Complete");
-  SolonoidSetup();
-  Serial.println("Solonoid Setup Complete");
+  SolenoidSetup();
+  Serial.println("Solenoid Setup Complete");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  ServoLoop(); // Call the servo loop function
-  SwitchLoop(); // Call the switch loop function
-  CompassLoop(); // Call the compass loop function
-  SolonoidLoop(); // Call the solonoid loop function
+  
 }
 
 // put function definitions here:
+double angleError(double target, double current) {
+  double error = target - current;
+  // Normalize the error to the range [-180, 180]
+  while (error > 180) error -= 360;
+  while (error < -180) error += 360;
+  return error;
+}

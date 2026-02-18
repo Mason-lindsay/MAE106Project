@@ -9,8 +9,14 @@ class Switch {
 public:
     void attach(int pin);
     bool read();
+    double distanceTraveled();
+    int timeOn();
+    int timeOff();
 private:
     int pin_;
+    unsigned long startTime_;
+    unsigned long endTime_;
+    bool wasOff_ = true;
 };
 
 void SwitchSetup();
