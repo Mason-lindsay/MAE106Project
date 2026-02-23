@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#define COMPASS_IN A0 // Replace with the actual pin number
+#define COMPASS_IN A5 // Replace with the actual pin number
 
 class Compass {
 public:

@@ -16,6 +16,7 @@ void SetServo(int angle) {
     }
     servo.write(angle); // Set the servo to the specified angle
     servoAngle = angle;
+    Serial.println("Servo angle set to: " + String(servoAngle)); // Print the current servo angle to the serial monitor
 }
 
 void ServoSetup() {

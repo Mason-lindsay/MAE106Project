@@ -1,17 +1,42 @@
 #include "Solenoid.h"
-#include <Arduino.h>
 
-Solenoid solenoid;
+Solenoid solenoidDevice;  // global instance
 
+void Solenoid::attach(int pin) {
+    pin_ = pin;
+    pinMode(pin_, OUTPUT);
+    off();  // start OFF for safety
+}
+
+void Solenoid::on() {
+    digitalWrite(pin_, HIGH);
+    state_ = true;
+}
+
+void Solenoid::off() {
+    digitalWrite(pin_, LOW);
+    state_ = false;
+}
+
+void Solenoid::toggle() {
+    if (state_) {
+        off();
+        delay(900);
+    } else {
+        on();
+        delay(700); // Keep the solenoid on for 700 ms
+    }
+}
+
+bool Solenoid::isOn() {
+    return state_;
+}
+
+// Helper functions
 void SolenoidSetup() {
-    solenoid.attach(SOL_IN); // Attach the solenoid to the defined pin
-    solenoid.write(0); // Set initial position to 0 (off)
+    solenoidDevice.attach(SOL_PIN);
 }
 
 void SolenoidLoop() {
-    // loop to activate the solenoid for .9 seconds and then deactivate it for .7 seconds, repeatedly
-    solenoid.write(1); // Activate the solenoid
-    delay(900); // Keep it activated for .9 seconds
-    solenoid.write(0); // Deactivate the solenoid
-    delay(700); // Wait for .7 seconds before the next activation
+    solenoidDevice.toggle();
 }

@@ -4,7 +4,7 @@
 #include <Servo.h>
 #include <Arduino.h>
 
-#define SERV_IN 9 // Replace with the actual pin number
+#define SERV_IN 3 // Replace with the actual pin number
 
     void ServoSetup();
     void ServoLoop();

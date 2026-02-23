@@ -1,19 +1,24 @@
-#ifndef Solenoid_H
-#define Solenoid_H
+#ifndef SOLENOID_H
+#define SOLENOID_H
 
 #include <Arduino.h>
 
-#define SOL_IN 8 // Replace with the actual pin number
+#define SOL_PIN 2   // Output pin controlling solenoid
 
 class Solenoid {
 public:
     void attach(int pin);
-    void write(int value);
-    
+    void on();
+    void off();
+    void toggle();
+    bool isOn();
+
 private:
     int pin_;
+    bool state_ = false;
 };
 
 void SolenoidSetup();
 void SolenoidLoop();
+
 #endif
