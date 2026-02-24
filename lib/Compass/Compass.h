@@ -2,17 +2,16 @@
 #define Compass_H
 
 #include <Arduino.h>
-
-#define COMPASS_IN A5 // Replace with the actual pin number
+#include <Wire.h>
+#include <Adafruit_LIS3MDL.h>
 
 class Compass {
-public:
-    void attach(int pin);
-    int read();
 private:
-    int pin_;
+    Adafruit_LIS3MDL mag;
+
+public:
+    bool begin();           // Initialize sensor
+    float read();           // Return heading in degrees
 };
 
-void CompassSetup();
-void CompassLoop();
 #endif

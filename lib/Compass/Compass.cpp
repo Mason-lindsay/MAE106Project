@@ -1,27 +1,18 @@
 #include "Compass.h"
+#include <math.h>
 
-//global instance
-Compass compass;
-
-//Class Methods 
-void Compass::attach(int pin) {
-    pin_ = pin;
-    pinMode(pin_, INPUT);
+bool Compass::begin() {
+    Wire.begin();
+    if (!mag.begin_I2C()) {
+        return false;
+    }
+    return true;
 }
 
-int Compass::read() {
-    // Read the analog value from the compass pin
-    int value = analogRead(pin_);
-    return value;
-}
-
-// Helper Functions
-void CompassSetup() {
-    compass.attach(COMPASS_IN); 
-}
-
-void CompassLoop() {
-    int compassValue = compass.read(); 
-    Serial.print("Heading: ");
-    Serial.println(compassValue);
+float Compass::read() {
+    sensors_event_t event;
+    mag.getEvent(&event);
+    float heading = atan2(event.magnetic.y, event.magnetic.x) * 180 / PI;
+    if (heading < 0) heading += 360;
+    return heading;
 }

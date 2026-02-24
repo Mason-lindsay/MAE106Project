@@ -1,7 +1,5 @@
 #include "Solenoid.h"
 
-Solenoid solenoidDevice;  // global instance
-
 void Solenoid::attach(int pin) {
     pin_ = pin;
     pinMode(pin_, OUTPUT);
@@ -30,13 +28,4 @@ void Solenoid::toggle() {
 
 bool Solenoid::isOn() {
     return state_;
-}
-
-// Helper functions
-void SolenoidSetup() {
-    solenoidDevice.attach(SOL_PIN);
-}
-
-void SolenoidLoop() {
-    solenoidDevice.toggle();
 }

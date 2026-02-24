@@ -11,6 +11,7 @@ public:
     bool read();
     double distanceTraveled();
     bool switchState();
+    
 private:
     int pin_;
     bool lastStableState_ = false;
@@ -21,6 +22,4 @@ private:
     double wheelDiameter_ = 0.07; // (m)
 };
 
-void SwitchSetup();
-void SwitchLoop();
 #endif

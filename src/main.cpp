@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Wire.h>                 // I2C communication
 #include "Servos.h"
 #include "Switch.h"
 #include "Compass.h"
@@ -25,27 +26,40 @@ bool endReached = false;
 Compass compass;
 Switch switchDevice;
 Solenoid solenoidDevice;
-Servo servo;
+
+void SwitchSetup();
+void CompassSetup();
+void SolenoidSetup();
+void setNewTarget();
+bool isTargetReached();
+double targetDistance(double x1, double y1, double x2, double y2);
+double targetAngle(double x1, double y1, double x2, double y2);
+double angleError(double target, double current);
 
 void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-  Serial.println("Starting");
-  ServoSetup();
-  Serial.println("Servo Setup Complete");
-  SwitchSetup();
-  Serial.println("Switch Setup Complete");
-  CompassSetup();
-  Serial.println("Compass Setup Complete");
-  SolenoidSetup();
-  Serial.println("Solenoid Setup Complete");
+    Serial.begin(9600);
+    Serial.println("Starting");
+
+    ServoSetup();
+    Serial.println("Servo Setup Complete");
+
+    SwitchSetup();
+    Serial.println("Switch Setup Complete");
+
+    CompassSetup();
+    Serial.println("Compass Setup Complete");
+
+    SolenoidSetup();
+    Serial.println("Solenoid Setup Complete");
+
+    delay(15000);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   if (endReached) {
     Serial.println("All targets reached. Stopping.");
-    servo.SetServo(90);
+    SetServo(90);
     solenoidDevice.off();
     while (true); // Stop the loop
   }
@@ -68,13 +82,13 @@ void loop() {
 
       turn = constrain(turn, -30, 30);
 
-      servo.SetServo(90 + turn);
+      SetServo(90 + turn);
     } else {
       SetServo(90); // Center the servo if we're mostly aligned
     }
 
     if (distanceToTarget > 0.1) { // If we're far from the target
-      solenoidDevice.on(); // Activate solenoid to move forward
+      solenoidDevice.toggle(); // Activate solenoid to move forward
     } 
     else { 
       targetReached = true; // Target reached, set new target or stop moving
@@ -86,11 +100,26 @@ void loop() {
 
 
 // put function definitions here:
+void CompassSetup() {
+    if (!compass.begin()) {
+        Serial.println("Failed to initialize compass!");
+        while (1); // Stop the program if the sensor isn't found
+    }
+}
+
+void SolenoidSetup() {
+    solenoidDevice.attach(SOL_PIN);
+}
+
+void SwitchSetup() {
+    switchDevice.attach(SWITCH_IN);
+}
+
 void setNewTarget() {
-  if (targetX == 1 && targetY == 1) {
+  if (abs(targetX - 1.0) < 1e-6 && abs(targetY - 1.0) < 1e-6) {
     targetX = target2X;
     targetY = target2Y;
-  } else if (targetX == target2X && targetY == target2Y) {
+  } else if (abs(targetX - target2X) < 1e-6 && abs(targetY - target2Y) < 1e-6) {
     targetX = target3X;
     targetY = target3Y;
   } else if (targetX == target3X && targetY == target3Y) {
@@ -105,7 +134,6 @@ void setNewTarget() {
 bool isTargetReached() {
   double tolerance = 0.05;  // meters
   if (targetDistance(x, y, targetX, targetY) < tolerance) {
-    setNewTarget();
     return true;
   }
   return false;

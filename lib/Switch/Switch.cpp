@@ -1,9 +1,6 @@
 #include "Switch.h"
 #include <Arduino.h>
 
-//global instance
-Switch switchDevice;
-
 //Class Methods
 void Switch::attach(int pin) {
     pin_ = pin;
@@ -49,16 +46,4 @@ double Switch::distanceTraveled(){
         distance_ += (wheelDiameter_ * 3.14159) / 2; // Assuming the switch is triggered every half rotation of the wheel
     }
     return distance_;
-}
-
-
-//Helper Functions
-void SwitchSetup() {
-    switchDevice.attach(SWITCH_IN); // Attach the switch to the defined pin
-}
-
-void SwitchLoop() {
-    bool switchState = switchDevice.read(); // Read the switch state
-    Serial.print("Switch State: ");
-    Serial.println(switchState ? "ON" : "OFF");
 }
