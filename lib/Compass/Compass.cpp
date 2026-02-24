@@ -13,6 +13,11 @@ float Compass::read() {
     sensors_event_t event;
     mag.getEvent(&event);
     float heading = atan2(event.magnetic.y, event.magnetic.x) * 180 / PI;
-    if (heading < 0) heading += 360;
+    if (heading < -180){
+        heading += 360;
+    }
+    else if (heading > 180){
+        heading -= 360;
+    }
     return heading;
 }

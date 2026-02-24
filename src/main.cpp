@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <Wire.h>                 // I2C communication
+#include <Wire.h>                
 #include "Servos.h"
 #include "Switch.h"
 #include "Compass.h"
@@ -11,6 +11,7 @@ double x = 0;
 double y = 0;
 
 // Replace with target coordinates
+// Reference frame changes with each target, so we reset x and y to 0 at each new target
 double targetX = 1;
 double targetY = 1;
 double target2X = 2;
@@ -56,7 +57,7 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  //Check if all targets have been reached
   if (endReached) {
     Serial.println("All targets reached. Stopping.");
     SetServo(90);
@@ -64,13 +65,17 @@ void loop() {
     while (true); // Stop the loop
   }
 
+  // Main control loop
   targetReached = isTargetReached();
+
+  // Read sensor data and update position
   if (!targetReached) {
     orientation = compass.read();
     distance = switchDevice.distanceTraveled();
     x += distance * cos(orientation * PI / 180);
     y += distance * sin(orientation * PI / 180);
 
+    // Calculate distance and angle to target
     double distanceToTarget = targetDistance(x, y, targetX, targetY);
     double angleToTarget = targetAngle(x, y, targetX, targetY);
     double angleErr = angleError(angleToTarget, orientation);
@@ -87,6 +92,7 @@ void loop() {
       SetServo(90); // Center the servo if we're mostly aligned
     }
 
+    // Control solenoid based on distance to target
     if (distanceToTarget > 0.1) { // If we're far from the target
       solenoidDevice.toggle(); // Activate solenoid to move forward
     } 
@@ -119,12 +125,18 @@ void setNewTarget() {
   if (abs(targetX - 1.0) < 1e-6 && abs(targetY - 1.0) < 1e-6) {
     targetX = target2X;
     targetY = target2Y;
+    x = 0;
+    y = 0;
   } else if (abs(targetX - target2X) < 1e-6 && abs(targetY - target2Y) < 1e-6) {
     targetX = target3X;
     targetY = target3Y;
+    x = 0;
+    y = 0;
   } else if (targetX == target3X && targetY == target3Y) {
     targetX = target4X;
     targetY = target4Y;
+    x = 0;
+    y = 0;
   }
   else {
     endReached = true; // All targets reached
