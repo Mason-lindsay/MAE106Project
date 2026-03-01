@@ -10,9 +10,9 @@ double distance = 0;
 double x = 0;
 double y = 0;
 
-double Kp = 0.5;
+double Kp = 0.6;
 double Ki = 0.01;
-double Kd = 0.1;
+double Kd = 0.05;
 
 double integral = 0;
 double prevError = 0;
@@ -21,12 +21,12 @@ unsigned long prevTime = 0;
 
 // Replace with target coordinates
 // Reference frame changes with each target, so we reset x and y to 0 at each new target
-double targetX = 1;
+double targetX = 0;
 double targetY = 1;
-double target2X = 2;
+double target2X = 5;
 double target2Y = 0;
-double target3X = 0;
-double target3Y = 2;
+double target3X = 5;
+double target3Y = 0;
 double target4X = 2;
 double target4Y = 2;
 
@@ -68,16 +68,17 @@ void setup() {
     prevTime = millis();
 }
 
-void loop() { 
-  //Check if all targets have been reached 
-  solenoidDevice.on(); 
+void loop() {  
   // Activate solenoid to start moving 
-    if (endReached) { 
-      Serial.println("All targets reached. Stopping."); 
-      SetServo(90); 
-      solenoidDevice.off(); 
-      while (true); // Stop the loop 
-    } 
+  solenoidDevice.on(); 
+
+  if (endReached) { 
+    Serial.println("All targets reached. Stopping."); 
+    SetServo(90); 
+    solenoidDevice.off(); 
+    while (true); // Stop the loop 
+  } 
+
   // Main control loop 
   targetReached = isTargetReached(); 
   // Read sensor data and update position 
@@ -112,7 +113,7 @@ void loop() {
     } 
   } 
   else { 
-    endReached = true; // All targets reached 
+    setNewTarget(); 
   } 
 }
 
