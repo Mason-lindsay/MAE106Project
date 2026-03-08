@@ -16,6 +16,7 @@ public:
 private:
     int pin_;
     bool state_ = false;
+    double previousMillis = 0;
 };
 
 void SolenoidSetup();

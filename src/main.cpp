@@ -14,10 +14,15 @@ double Kp = 0.6;
 double Ki = 0.01;
 double Kd = 0.05;
 
+int solenoidPin = 2;
+int switchPin = 4;
+int servoPin = 3;
+
 double integral = 0;
 double prevError = 0;
 
 unsigned long prevTime = 0;
+unsigned long prevMillis = 0;
 
 // Replace with target coordinates
 // Reference frame changes with each target, so we reset x and y to 0 at each new target
@@ -47,8 +52,6 @@ double targetAngle(double x1, double y1, double x2, double y2);
 double angleError(double target, double current);
 
 void setup() {
-    prevTime = millis();
-
     Serial.begin(9600);
     Serial.println("Starting");
 
@@ -58,19 +61,44 @@ void setup() {
     SwitchSetup();
     Serial.println("Switch Setup Complete");
 
+    Serial.println("Scanning...");
+
+  for (byte address = 1; address < 127; address++) {
+    Wire.beginTransmission(address);
+    if (Wire.endTransmission() == 0) {
+      Serial.print("Found device at 0x");
+      Serial.println(address, HEX);
+    }
+  }
+  
     CompassSetup();
     Serial.println("Compass Setup Complete");
 
     SolenoidSetup();
     Serial.println("Solenoid Setup Complete");
 
+    Wire.begin();
+  Serial.begin(9600);
+
+  Serial.println("Done");
+  
     delay(15000);
+
     prevTime = millis();
+    prevMillis = millis();
+
+    solenoidDevice.on();
 }
 
 void loop() {  
-  // Activate solenoid to start moving 
-  solenoidDevice.on(); 
+  if (solenoidDevice.isOn() && (millis() - prevMillis >= 700)) {
+    solenoidDevice.off(); // Ensure solenoid turns off after 700 ms
+    prevMillis = millis(); // Reset the timer after toggling
+  }
+  else if (!solenoidDevice.isOn() && (millis() - prevMillis >= 900)) {
+    solenoidDevice.on(); // Ensure solenoid turns on after 900 ms
+    prevMillis = millis(); // Reset the timer after toggling
+  }
 
   if (endReached) { 
     Serial.println("All targets reached. Stopping."); 
@@ -101,15 +129,15 @@ void loop() {
     double error = angleErr; 
         
     if (abs(error) < 5) { 
-      integral = 0; 
-      SetServo(90); 
+      integral = 0;  
     } 
     else { 
       integral += error * dt; 
       integral = constrain(integral, -50, 50); 
       double derivative = (error - prevError) / dt; 
       double turn = Kp * error + Ki * integral + Kd * derivative; 
-      turn = constrain(turn, -30, 30); SetServo(90 - turn); 
+      turn = constrain(turn, -30, 30); 
+      SetServo(-(90 - turn)); 
     } 
   } 
   else { 
@@ -127,12 +155,12 @@ void CompassSetup() {
 
 /// @brief Initializes the solenoid and attaches it to the specified pin
 void SolenoidSetup() {
-    solenoidDevice.attach(SOL_PIN);
+    solenoidDevice.attach(solenoidPin);
 }
 
 /// @brief Initializes the switch and attaches it to the specified pin
 void SwitchSetup() {
-    switchDevice.attach(SWITCH_IN);
+    switchDevice.attach(switchPin);
 }
 
 /// @brief Sets the next target coordinates and resets the position and PID state for the new target

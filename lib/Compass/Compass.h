@@ -8,7 +8,6 @@
 class Compass {
 private:
     Adafruit_LIS3MDL mag;
-
 public:
     bool begin();           // Initialize sensor
     float read();           // Return heading in degrees

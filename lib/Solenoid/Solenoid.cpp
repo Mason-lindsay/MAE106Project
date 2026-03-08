@@ -17,12 +17,12 @@ void Solenoid::off() {
 }
 
 void Solenoid::toggle() {
-    if (state_) {
+    if (state_ && (millis() - previousMillis >= 700)) { // If currently on and 700 ms have passed
         off();
-        delay(900);
-    } else {
+        previousMillis = millis(); // Reset the timer after toggling
+    } else if (!state_ && (millis() - previousMillis >= 900)) { // If currently off and 900 ms have passed
         on();
-        delay(700); // Keep the solenoid on for 700 ms
+        previousMillis = millis(); // Reset the timer after toggling
     }
 }
 
